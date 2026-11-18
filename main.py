@@ -50,12 +50,18 @@ def run_preset_batch(files: List[str], target_preset: str):
 def run_gui(files: List[str], open_settings: bool = False):
     """PyQt6 Grafik Arayüzünü Başlatır."""
     from PyQt6.QtWidgets import QApplication
+    from PyQt6.QtGui import QIcon
+    from core.registry import get_icon_path
     from ui.batch_dialog import BatchDialog
     from ui.settings_dialog import SettingsDialog
 
     app = QApplication.instance()
     if app is None:
         app = QApplication(sys.argv)
+
+    icon_path = get_icon_path()
+    if Path(icon_path).exists():
+        app.setWindowIcon(QIcon(icon_path))
 
     if open_settings:
         dlg = SettingsDialog()

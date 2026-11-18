@@ -8,11 +8,13 @@ from PyQt6.QtWidgets import (
     QCheckBox, QSlider, QComboBox, QGroupBox, QFileDialog, QMessageBox
 )
 from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QIcon
 
 from core.config import load_settings, save_settings
 from core.registry import (
     install_context_menu, uninstall_context_menu,
-    is_context_menu_installed, create_sendto_shortcut, remove_sendto_shortcut
+    is_context_menu_installed, create_sendto_shortcut, remove_sendto_shortcut,
+    get_icon_path
 )
 
 class SettingsDialog(QDialog):
@@ -20,6 +22,12 @@ class SettingsDialog(QDialog):
         super().__init__(parent)
         self.setWindowTitle("FileForm - Ayarlar ve Sistem Entegrasyonu")
         self.setFixedSize(540, 480)
+
+        # İkon ayarla
+        icon_path = get_icon_path()
+        if Path(icon_path).exists():
+            self.setWindowIcon(QIcon(icon_path))
+
         self.settings = load_settings()
         self._init_ui()
 

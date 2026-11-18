@@ -12,10 +12,11 @@ from PyQt6.QtWidgets import (
     QCheckBox, QProgressBar, QMessageBox, QFileDialog
 )
 from PyQt6.QtCore import Qt, QThread, pyqtSignal
-from PyQt6.QtGui import QDragEnterEvent, QDropEvent
+from PyQt6.QtGui import QDragEnterEvent, QDropEvent, QIcon, QPixmap
 
 from core.config import load_settings, save_settings
 from core.notification import send_toast
+from core.registry import get_icon_path
 from converters.manager import ConversionManager
 from ui.settings_dialog import SettingsDialog
 from ui.modern_theme import DARK_THEME, LIGHT_THEME
@@ -51,8 +52,13 @@ class BatchDialog(QDialog):
     def __init__(self, files: Optional[List[str]] = None, parent=None):
         super().__init__(parent)
         self.setWindowTitle("FileForm - Yerel Toplu Dosya Dönüştürücü")
-        self.resize(760, 520)
+        self.resize(780, 530)
         self.setAcceptDrops(True)
+
+        # Pencere ikonu
+        icon_path = get_icon_path()
+        if Path(icon_path).exists():
+            self.setWindowIcon(QIcon(icon_path))
 
         self.manager = ConversionManager()
         self.settings = load_settings()
@@ -74,6 +80,16 @@ class BatchDialog(QDialog):
 
         # Üst Başlık ve Bilgi Çubuğu
         header_row = QHBoxLayout()
+
+        # Logo görseli
+        logo_path = Path(__file__).parent.parent / "assets" / "icon.png"
+        if logo_path.exists():
+            lbl_logo = QLabel()
+            pix = QPixmap(str(logo_path)).scaled(48, 48, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
+            lbl_logo.setPixmap(pix)
+            lbl_logo.setFixedSize(48, 48)
+            header_row.addWidget(lbl_logo)
+
         title_box = QVBoxLayout()
         self.lbl_title = QLabel("Toplu Dosya Dönüştürücü")
         self.lbl_title.setStyleSheet("font-size: 18px; font-weight: bold; color: #89b4fa;")

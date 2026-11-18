@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/logo.png" alt="FileForm Logo" width="500">
+</p>
+
 # FileForm - Windows Yerel Toplu Dosya Dönüştürücü
 
 FileForm, herhangi bir internet bağlantısına veya üçüncü taraf bulut hizmetine ihtiyaç duymadan, doğrudan Windows sağ tık bağlam menüsü üzerinden çalışan yüksek hızlı ve yerel bir toplu dosya dönüştürücüdür.

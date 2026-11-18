@@ -22,6 +22,21 @@ PRESET_MENU_ITEMS = [
     ("07_mp4", "MP4'e Dönüştür (Video)", "--preset mp4"),
 ]
 
+def get_icon_path() -> str:
+    """Uygulama veya menü için .ico simge yolunu döner."""
+    if getattr(sys, "frozen", False):
+        exe_dir = Path(sys.executable).parent
+        ico = exe_dir / "assets" / "icon.ico"
+        if ico.exists():
+            return str(ico.resolve())
+        return sys.executable
+    else:
+        project_dir = Path(__file__).parent.parent
+        ico = project_dir / "assets" / "icon.ico"
+        if ico.exists():
+            return str(ico.resolve())
+        return sys.executable
+
 def get_launch_command(extra_args: str = "") -> str:
     """
     Çalışma ortamına göre doğru yürütme komutunu üretir.
@@ -70,12 +85,14 @@ def create_sendto_shortcut() -> bool:
             main_script = (Path(__file__).parent.parent / "main.py").resolve()
             args = f'"{main_script}" --gui'
 
+        icon_path = get_icon_path()
         # PowerShell ile temiz .lnk kısayolu üret
         ps_cmd = f"""
         $WshShell = New-Object -ComObject WScript.Shell
         $Shortcut = $WshShell.CreateShortcut('{str(shortcut_path)}')
         $Shortcut.TargetPath = '{target_path}'
         $Shortcut.Arguments = '{args}'
+        $Shortcut.IconLocation = '{icon_path}'
         $Shortcut.Description = 'FileForm ile Toplu Dönüştür'
         $Shortcut.Save()
         """
@@ -107,14 +124,13 @@ def install_context_menu() -> Tuple[bool, str]:
     Yönetici yetkisi gerektirmez.
     """
     try:
+        icon_path = get_icon_path()
+
         # 1. Ana Menü Anahtarı: HKCU\Software\Classes\*\shell\FileForm
         root_key = winreg.CreateKey(winreg.HKEY_CURRENT_USER, REG_BASE)
         winreg.SetValueEx(root_key, "MUIVerb", 0, winreg.REG_SZ, "FileForm ile Dönüştür")
         winreg.SetValueEx(root_key, "SubCommands", 0, winreg.REG_SZ, "")
-
-        # Simge belirle
-        icon_path = sys.executable if getattr(sys, "frozen", False) else sys.executable
-        winreg.SetValueEx(root_key, "Icon", 0, winreg.REG_SZ, f'"{icon_path}",0')
+        winreg.SetValueEx(root_key, "Icon", 0, winreg.REG_SZ, f'"{icon_path}"')
         winreg.CloseKey(root_key)
 
         # 2. Alt Menüler: HKCU\Software\Classes\*\shell\FileForm\shell
@@ -123,6 +139,7 @@ def install_context_menu() -> Tuple[bool, str]:
             item_path = f"{sub_shell_path}\\{key_name}"
             item_key = winreg.CreateKey(winreg.HKEY_CURRENT_USER, item_path)
             winreg.SetValueEx(item_key, "MUIVerb", 0, winreg.REG_SZ, label)
+            winreg.SetValueEx(item_key, "Icon", 0, winreg.REG_SZ, f'"{icon_path}"')
             winreg.CloseKey(item_key)
 
             # command anahtarı
@@ -135,7 +152,7 @@ def install_context_menu() -> Tuple[bool, str]:
         # 3. Klasör Sağ Tık Menüsü: HKCU\Software\Classes\Directory\shell\FileForm
         dir_key = winreg.CreateKey(winreg.HKEY_CURRENT_USER, REG_DIR_BASE)
         winreg.SetValueEx(dir_key, "MUIVerb", 0, winreg.REG_SZ, "Klasördeki Dosyaları Dönüştür (FileForm)...")
-        winreg.SetValueEx(dir_key, "Icon", 0, winreg.REG_SZ, f'"{icon_path}",0')
+        winreg.SetValueEx(dir_key, "Icon", 0, winreg.REG_SZ, f'"{icon_path}"')
         winreg.CloseKey(dir_key)
 
         dir_cmd_key = winreg.CreateKey(winreg.HKEY_CURRENT_USER, f"{REG_DIR_BASE}\\command")

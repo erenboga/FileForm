@@ -20,6 +20,8 @@ def build_executable():
         "--onedir",                       # Hızlı başlatma ve ffmpeg performansı için onedir veya onefile
         "--windowed",                     # Konsol penceresi açılmasın
         "--name", "FileForm",
+        "--icon", str(project_dir / "assets" / "icon.ico"),
+        "--add-data", f"{project_dir / 'assets'};assets",
         "--collect-all", "imageio_ffmpeg",
         "--collect-all", "pypdfium2",
         "--hidden-import", "win32com.client",
