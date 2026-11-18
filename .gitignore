@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.env
+venv/
+env/
+ENV/
+
+# PyInstaller / Build
+build/
+dist/
+*.spec
+
+# Test & IDE
+.pytest_cache/
+.vscode/
+.idea/
+
+# Local outputs
+Dönüştürülenler/
+Converted/
+*.tmp
